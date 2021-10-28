@@ -1,4 +1,4 @@
-FROM registry.access.redhat.com/ubi8/nodejs-14
+FROM registry.access.redhat.com/ubi8/nodejs-12
 
 ENV RC_VERSION 4.1.0
 
@@ -13,12 +13,12 @@ LABEL name="Rocket.Chat" \
       description="The Ultimate Open Source Web Chat Platform" \
       run="docker run -d --name ${NAME} ${IMAGE}"
 
-
-# This is ugly... But for some reason npm and node aren't available at this stage.
-ENV PATH /opt/rh/rh-nodejs8/root/usr/bin:/opt/app-root/src/node_modules/.bin/:/opt/app-root/src/.npm-global/bin/:/opt/app-root/src/bin:/opt/app-root/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+USER root
+RUN dnf install -y python38 && rm -rf /var/cache /var/log/dnf* /var/log/yum.*
+USER default
 
 # RUN set -x \
-#  && gpg --keyserver ha.pool.sks-keyservers.net --recv-keys 0E163286C20D07B9787EBE9FD7F9D0414FD08104 \
+#  && gpg --keyserver keys.openpgp.org --recv-keys 0E163286C20D07B9787EBE9FD7F9D0414FD08104 \
 #  && curl -SLf "https://releases.rocket.chat/${RC_VERSION}/download" -o rocket.chat.tgz \
 #  && curl -SLf "https://releases.rocket.chat/${RC_VERSION}/asc" -o rocket.chat.tgz.asc \
 #  && gpg --verify rocket.chat.tgz.asc \
@@ -38,13 +38,9 @@ VOLUME /opt/app-root/src/uploads
 
 WORKDIR /opt/app-root/src/bundle
 
-# Hack needed to force use of bundled library instead of system level outdated library
-# https://github.com/lovell/sharp/issues/892
-ENV LD_PRELOAD=/opt/app-root/src/bundle/programs/server/npm/node_modules/sharp/vendor/lib/libz.so
-
 ENV DEPLOY_METHOD=docker-redhat \
     NODE_ENV=production \
-    MONGO_URL=mongodb://dbuser:dbpassword@mongo:27017/rocketchat \
+    MONGO_URL=mongodb://mongo:27017/rocketchat \
     HOME=/tmp \
     PORT=3000 \
     ROOT_URL=http://localhost:3000
