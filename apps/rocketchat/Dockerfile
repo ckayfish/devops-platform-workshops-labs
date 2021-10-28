@@ -1,4 +1,4 @@
-FROM registry.access.redhat.com/rhscl/nodejs-8-rhel7
+FROM registry.access.redhat.com/ubi8/nodejs-14
 
 ENV RC_VERSION 0.69.2
 
