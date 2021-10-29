@@ -73,7 +73,7 @@ RUN chown -R 1001:0 ${APP_ROOT} && chmod -R ug+rwx ${APP_ROOT} && \
     rpm-file-permissions
 
 # Update config file to make it a replica set
-RUN echo -e "replication:\n  replSetName: \"rs01\"" | sudo tee -a /etc/mongod.conf
+RUN echo -e "replication:\n  replSetName: \"rs01\"" | tee -a /etc/mongod.conf
 
 
 USER 1001
